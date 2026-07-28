@@ -4,68 +4,117 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <title>Heroes Lore: Zero</title>
     <link rel="icon" href="/icon.png" />
-    <link rel="stylesheet" href="/css/app.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d0f1a;
+        --panel: #161a2b;
+        --accent: #ffcf4d;
+        --text: #e8eaf2;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(1200px 800px at 50% -10%, #1c2140, #0d0f1a 70%);
+        color: #e8eaf2;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      #app {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 12px 28px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+      }
+      header img { image-rendering: pixelated; border-radius: 8px; }
+      header h1 { margin: 0; font-size: 20px; letter-spacing: 0.3px; }
+      header p { margin: 2px 0 0; font-size: 12px; opacity: 0.7; }
+      #stage {
+        position: relative;
+        width: min(96vw, 760px);
+        height: min(78vh, 620px);
+        background: #000;
+        border: 1px solid #2a2f4a;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #stage > .cheerpjDisplay,
+      #stage > div,
+      #stage canvas { max-width: 100%; max-height: 100%; }
+      #status {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 82%;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid #2a2f4a;
+        color: var(--accent);
+      }
+      #status.error { color: #ff8080; border-color: #5a2a2a; }
+      .hint {
+        max-width: 760px;
+        font-size: 12px;
+        opacity: 0.72;
+        text-align: center;
+        line-height: 1.6;
+      }
+      .hint kbd {
+        background: #232840;
+        border: 1px solid #39406a;
+        border-bottom-width: 2px;
+        border-radius: 5px;
+        padding: 1px 6px;
+        font-size: 11px;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
       <header>
-        <img src="/icon.png" alt="" width="36" height="36" />
+        <img src="/icon.png" alt="" width="40" height="40" />
         <div>
           <h1>Heroes Lore: Zero</h1>
-          <p>Native JS/Canvas port · original code, dialog & assets · touch ready</p>
+          <p>Original J2ME game running in-browser (CheerpJ + MicroEmulator)</p>
         </div>
       </header>
 
       <div id="stage">
-        <canvas id="game" width="240" height="320" aria-label="Game screen"></canvas>
         <div id="status">Loading…</div>
       </div>
 
-      <div id="touch-pad" aria-label="On-screen controls">
-        <div class="pad-block">
-          <h2>Keypad</h2>
-          <div class="soft-row">
-            <button class="key" data-key="-6" type="button">L</button>
-            <button class="key fire" data-key="-5" type="button">OK</button>
-            <button class="key" data-key="-7" type="button">R</button>
-          </div>
-          <div class="num-grid">
-            <button class="key" data-key="49" type="button">1<span>ABC</span></button>
-            <button class="key" data-key="50" type="button">2<span>ABC</span></button>
-            <button class="key" data-key="51" type="button">3<span>DEF</span></button>
-            <button class="key" data-key="52" type="button">4<span>GHI</span></button>
-            <button class="key" data-key="53" type="button">5<span>JKL</span></button>
-            <button class="key" data-key="54" type="button">6<span>MNO</span></button>
-            <button class="key" data-key="55" type="button">7<span>PQRS</span></button>
-            <button class="key" data-key="56" type="button">8<span>TUV</span></button>
-            <button class="key" data-key="57" type="button">9<span>WXYZ</span></button>
-            <button class="key" data-key="42" type="button">*</button>
-            <button class="key" data-key="48" type="button">0</button>
-            <button class="key" data-key="35" type="button">#</button>
-          </div>
-        </div>
-        <div class="pad-block">
-          <h2>D-Pad</h2>
-          <div class="dpad">
-            <button class="key ghost" tabindex="-1" type="button"></button>
-            <button class="key" data-key="-1" type="button">↑</button>
-            <button class="key ghost" tabindex="-1" type="button"></button>
-            <button class="key" data-key="-3" type="button">←</button>
-            <button class="key fire" data-key="-5" type="button">●</button>
-            <button class="key" data-key="-4" type="button">→</button>
-            <button class="key ghost" tabindex="-1" type="button"></button>
-            <button class="key" data-key="-2" type="button">↓</button>
-            <button class="key ghost" tabindex="-1" type="button"></button>
-          </div>
-        </div>
-      </div>
+      <p class="hint">
+        Click the screen to give it focus, then use the on-screen phone keypad or your keyboard.
+        <br />
+        <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> move ·
+        <kbd>Numpad 5</kbd> / <kbd>Enter</kbd> select/fire ·
+        number keys map to the phone keypad.
+      </p>
     </div>
 
-    <script type="module" src="/js/main.js"></script>
+    <script src="https://cjrtnc.leaningtech.com/3.0/cj3loader.js"></script>
+    <script type="module" src="/js/emulator.js"></script>
   </body>
 </html>

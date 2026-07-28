@@ -1,14 +1,20 @@
 # Heroes Lore: Zero — Web Port
 
-Native **JavaScript / Canvas** port of the J2ME RPG (not an emulator).
+Play the original **Heroes Lore: Zero** J2ME game in the browser.
 
-## Approach
+## How it runs
 
-1. Remap obfuscated bytecode (unique field/method names)
-2. Decompile → transpile game logic to ES modules
-3. MIDP shims (`Canvas`, `Graphics`, `Image`, `RMS`, …) on HTML5 Canvas
-4. **Original** dialog (`.m`), maps, sprites, and other assets from the JAR under `public/res/`
-5. On-screen **touch keypad** + keyboard
+The original title is a MIDP-2.0 / CLDC-1.1 J2ME MIDlet (`rpg.RPGHeroEx`). Rather than
+rely on a lossy source-level transpile of the obfuscated bytecode, the browser build runs
+the **original JAR** through a real J2ME runtime, entirely client-side:
+
+- **[CheerpJ](https://cheerpj.com)** — a Java SE → WebAssembly JVM that runs in the browser.
+- **[MicroEmulator](https://github.com/barteo/microemu)** — a MIDP-2.0 implementation
+  providing the `javax.microedition.*` APIs plus a phone device UI.
+
+CheerpJ executes MicroEmulator (and the game's) bytecode; MicroEmulator draws the emulated
+phone. The optional JSR add-ons (`microemu-jsr-120/135/75`, `microemu-nokiaui`) are bundled
+because the game touches WMA, MMAPI, FileConnection and the Nokia UI API.
 
 ## Run
 
@@ -16,31 +22,35 @@ Native **JavaScript / Canvas** port of the J2ME RPG (not an emulator).
 npm start
 ```
 
-Open http://localhost:4173/
+Then open http://localhost:4173/ . The first load fetches the CheerpJ runtime from its CDN
+and boots straight into the game (EA logo → title → save-slot menu). Give the screen focus
+by clicking it.
 
 ### Controls
 
 | Input | Action |
 |-------|--------|
-| On-screen D-pad / OK / L / R | Softkeys & navigation |
-| Touch the game screen | Pointer |
-| Arrow keys / Enter | D-pad / OK |
-| Q / W | Left / right soft key |
+| Arrow keys | D-pad / navigation |
+| `Numpad 5` / `Enter` | OK / fire |
+| Number keys `0`–`9`, `*`, `#` | Phone keypad |
+| On-screen phone buttons | Same, via mouse/touch |
 
 ## Layout
 
 ```
-original/          # source JAR (+ remapped)
-game-src/          # decompiled Java
 public/
-  index.html       # touch UI shell
-  res/             # original assets & dialogue
-  js/midp/         # MIDP → Canvas runtime
-  js/game/         # transpiled game code
-tools/             # remap + transpile
+  index.html          # page shell + CheerpJ bootstrap
+  js/emulator.js       # CheerpJ + MicroEmulator boot (runs the original JAR)
+  lib/                 # microemulator + JSR add-on jars + the game jar
+original/              # source JAR (canonical copy)
+game-src/              # decompiled Java (reference only)
+public/js/game/        # earlier regex-transpiled JS (reference only; not used at runtime)
+tools/                 # remap + transpile helpers
 ```
 
-## Status
+## Note on the JS transpile
 
-This is an in-progress native port of the full engine. Boot path, assets, dialogue data,
-and touch input are wired; some obfuscated edge cases may still need fixes while playing.
+`tools/transpile_java.py` + `public/js/game/` are an earlier experiment that machine-translated
+the decompiled Java to JavaScript. That output is not runnable (the regex transpiler cannot
+preserve Java control flow / semantics) and is kept only for reference. The playable build is
+the CheerpJ + MicroEmulator runtime described above.
