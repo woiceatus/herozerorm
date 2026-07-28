@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Heroes Lore: Zero</title>
+    <link rel="icon" href="/icon.png" />
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <img src="/icon.png" alt="" width="36" height="36" />
+        <div>
+          <h1>Heroes Lore: Zero</h1>
+          <p>Native JS/Canvas port · original code, dialog & assets · touch ready</p>
+        </div>
+      </header>
+
+      <div id="stage">
+        <canvas id="game" width="240" height="320" aria-label="Game screen"></canvas>
+        <div id="status">Loading…</div>
+      </div>
+
+      <div id="touch-pad" aria-label="On-screen controls">
+        <div class="pad-block">
+          <h2>Keypad</h2>
+          <div class="soft-row">
+            <button class="key" data-key="-6" type="button">L</button>
+            <button class="key fire" data-key="-5" type="button">OK</button>
+            <button class="key" data-key="-7" type="button">R</button>
+          </div>
+          <div class="num-grid">
+            <button class="key" data-key="49" type="button">1<span>ABC</span></button>
+            <button class="key" data-key="50" type="button">2<span>ABC</span></button>
+            <button class="key" data-key="51" type="button">3<span>DEF</span></button>
+            <button class="key" data-key="52" type="button">4<span>GHI</span></button>
+            <button class="key" data-key="53" type="button">5<span>JKL</span></button>
+            <button class="key" data-key="54" type="button">6<span>MNO</span></button>
+            <button class="key" data-key="55" type="button">7<span>PQRS</span></button>
+            <button class="key" data-key="56" type="button">8<span>TUV</span></button>
+            <button class="key" data-key="57" type="button">9<span>WXYZ</span></button>
+            <button class="key" data-key="42" type="button">*</button>
+            <button class="key" data-key="48" type="button">0</button>
+            <button class="key" data-key="35" type="button">#</button>
+          </div>
+        </div>
+        <div class="pad-block">
+          <h2>D-Pad</h2>
+          <div class="dpad">
+            <button class="key ghost" tabindex="-1" type="button"></button>
+            <button class="key" data-key="-1" type="button">↑</button>
+            <button class="key ghost" tabindex="-1" type="button"></button>
+            <button class="key" data-key="-3" type="button">←</button>
+            <button class="key fire" data-key="-5" type="button">●</button>
+            <button class="key" data-key="-4" type="button">→</button>
+            <button class="key ghost" tabindex="-1" type="button"></button>
+            <button class="key" data-key="-2" type="button">↓</button>
+            <button class="key ghost" tabindex="-1" type="button"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>

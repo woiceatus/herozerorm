@@ -1,0 +1,54 @@
+Summary for original/heroes-lore-zero-remapped.jar
+Decompiled with CFR 0.152
+
+
+a
+----------------------------
+
+a_m6_PLjavax_microedition_midlet_MIDlet_RV(javax.microedition.midlet.MIDlet )
+  Unable to fully structure code
+  Could not resolve type clashes
+
+
+df
+----------------------------
+
+c()
+  Unable to fully structure code
+
+
+di
+----------------------------
+
+b_m10_PBZRZ(byte boolean )
+  Loose catch block
+c_m8_PBRZ(byte )
+  Loose catch block
+
+
+ds
+----------------------------
+
+a_m2_PALjava_lang_String_RZ(java.lang.String[] )
+  Loose catch block
+
+
+o
+----------------------------
+
+a_m16_PABRV(byte[] )
+  Loose catch block
+
+
+rpg.e
+----------------------------
+
+a_m6_PLjava_lang_String_RAB(java.lang.String )
+  Loose catch block
+
+
+v
+----------------------------
+
+a_m2_PRV()
+  Unable to fully structure code
