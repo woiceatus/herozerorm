@@ -8,7 +8,7 @@
 - [x] Original assets under `public/res/`, touch + keyboard UI
 - [x] Sync PNG decode (UPNG), getRGB/drawRGB/createRGBImage
 - [x] Browser-test: title splash, menus, in-game world rendering & input
+- [x] Fix UI text: bitmap-font 1px drawLine + clip save/restore root
 
 ## Follow-ups
-- Dialogue/menu text polish if any glyph path still misses
 - Optional: TeaVM WASM target
