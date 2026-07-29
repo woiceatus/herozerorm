@@ -1,46 +1,30 @@
-# Heroes Lore: Zero — Web Port
+# Heroes Lore: Zero — Web Port (TeaVM)
 
-Native **JavaScript / Canvas** port of the J2ME RPG (not an emulator).
+Native **TeaVM AOT** port of the J2ME RPG: original game bytecode compiled to JavaScript with MIDP→Canvas adapters. **Not an emulator.**
 
 ## Approach
 
-1. Remap obfuscated bytecode (unique field/method names)
-2. Decompile → transpile game logic to ES modules
-3. MIDP shims (`Canvas`, `Graphics`, `Image`, `RMS`, …) on HTML5 Canvas
-4. **Original** dialog (`.m`), maps, sprites, and other assets from the JAR under `public/res/`
-5. On-screen **touch keypad** + keyboard
+1. Remap colliding fields in the original JAR (`RemapFieldsOnly`) so TeaVM can compile it.
+2. ASM-patch browser blockers (game loop, resources, threads, SMS gate, splash sync, buffer size, alpha reset).
+3. MIDP stubs (`javax.microedition.*`) draw to a DOM canvas; assets load from `/res`.
+4. TeaVM emits `public/js/teavm/game.js` (ES module).
 
 ## Run
 
 ```bash
-npm start
+npm run build   # remap + patch + mvn package → public/js/teavm/game.js
+npm start       # serve public on :4173
 ```
 
-Open http://localhost:4173/
-
-### Controls
-
-| Input | Action |
-|-------|--------|
-| On-screen D-pad / OK / L / R | Softkeys & navigation |
-| Touch the game screen | Pointer |
-| Arrow keys / Enter | D-pad / OK |
-| Q / W | Left / right soft key |
+Open http://127.0.0.1:4173/ — use on-screen keypad/D-pad or keyboard.
 
 ## Layout
 
-```
-original/          # source JAR (+ remapped)
-game-src/          # decompiled Java
-public/
-  index.html       # touch UI shell
-  res/             # original assets & dialogue
-  js/midp/         # MIDP → Canvas runtime
-  js/game/         # transpiled game code
-tools/             # remap + transpile
-```
-
-## Status
-
-This is an in-progress native port of the full engine. Boot path, assets, dialogue data,
-and touch input are wired; some obfuscated edge cases may still need fixes while playing.
+| Path | Role |
+|------|------|
+| `original/` | Original + field-remapped JARs |
+| `teavm-port/` | Maven/TeaVM project, MIDP adapters, ASM patches |
+| `public/res/` | Original game assets |
+| `public/js/teavm/game.js` | Compiled game |
+| `tools/build-teavm.sh` | Full rebuild |
+| `task.md` | Task checklist |

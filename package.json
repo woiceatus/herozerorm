@@ -1,9 +1,9 @@
 {
   "name": "herozerorm-web",
   "private": true,
-  "description": "Heroes Lore: Zero — native JavaScript/Canvas port (no emulator)",
+  "description": "Heroes Lore: Zero — TeaVM AOT web port (original bytecode + MIDP adapters, no emulator)",
   "scripts": {
-    "transpile": "python3 tools/transpile_java.py",
+    "build": "bash tools/build-teavm.sh",
     "start": "npx --yes serve -l 4173 public",
     "serve": "npx --yes serve -l 4173 public"
   }
