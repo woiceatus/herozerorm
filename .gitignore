@@ -4,6 +4,10 @@ node_modules/
 teavm-port/target/
 teavm-port/game-classes/
 teavm-port/*.class
+teavm-port/rpg/
+teavm-port/src/main/resources/**
+!teavm-port/src/main/resources/META-INF/
+!teavm-port/src/main/resources/META-INF/**
 original/heroes-lore-zero-fields.jar
 original/heroes-lore-zero-remapped.jar
 public/js/teavm/*.teavmdbg
