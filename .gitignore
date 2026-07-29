@@ -1,3 +1,9 @@
 node_modules/
 .DS_Store
 *.log
+teavm-port/target/
+teavm-port/game-classes/
+teavm-port/*.class
+original/heroes-lore-zero-fields.jar
+original/heroes-lore-zero-remapped.jar
+public/js/teavm/*.teavmdbg
