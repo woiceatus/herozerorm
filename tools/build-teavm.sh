@@ -17,7 +17,7 @@ rm -rf game-classes && mkdir game-classes
 
 echo "== Patch for browser =="
 javac -cp "$ROOT/vendor/asm-9.7.jar" PatchRpgC.java PatchResources.java PatchSleep.java \
-  PatchThreads.java PatchDs.java PatchAr.java PatchCm.java PatchBv.java PatchCmAlphaReset.java
+  PatchThreads.java PatchDs.java PatchAr.java PatchCm.java PatchBv.java PatchCmAlphaReset.java PatchCmDrawLine.java
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchRpgC game-classes/rpg/c.class game-classes/rpg/c.class
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchResources game-classes
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchSleep game-classes
@@ -26,6 +26,7 @@ java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchDs game-classes/ds.class
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchAr game-classes/ar.class
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchCm game-classes/cm.class
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchCmAlphaReset game-classes/cm.class
+java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchCmDrawLine game-classes/cm.class
 java -cp ".:$ROOT/vendor/asm-9.7.jar" PatchBv game-classes/bv.class
 
 echo "== TeaVM compile =="

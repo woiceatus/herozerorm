@@ -1,8 +1,6 @@
-
 package javax.microedition.lcdui;
 import org.teavm.jso.canvas.CanvasRenderingContext2D;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
-import org.teavm.jso.JSObject;
 import bootstrap.JsBridge;
 
 public class Graphics {
@@ -28,10 +26,15 @@ public class Graphics {
         this.ctx = ctx;
         this.width = w;
         this.height = h;
+        this.clipX = 0;
+        this.clipY = 0;
         this.clipW = w;
         this.clipH = h;
-        // Base state for MIDP setClip (replace, don't nest)
-        ctx.save();
+        // One immutable root save per canvas context — never nest extras in the constructor
+        // (extra saves capture active clips and break later setClip restore).
+        ensureRoot(ctx);
+        // Start each Graphics with a full-canvas clip (MIDP default)
+        applyClip(0, 0, w, h);
     }
 
     public void setColor(int RGB) {
@@ -48,18 +51,16 @@ public class Graphics {
     public void translate(int x, int y) { tx += x; ty += y; }
     public int getTranslateX() { return tx; }
     public int getTranslateY() { return ty; }
+
     public void setClip(int x, int y, int w, int h) {
         if (w <= 0 || h <= 0) { w = width; h = height; x = 0; y = 0; }
         clipX = x; clipY = y; clipW = w; clipH = h;
-        ctx.restore();
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(x + tx, y + ty, w, h);
-        ctx.clip();
+        applyClip(x + tx, y + ty, w, h);
         ctx.setFillStyle(css);
         ctx.setStrokeStyle(css);
         if (font != null) ctx.setFont(font.css());
     }
+
     public void clipRect(int x, int y, int w, int h) {
         int x2 = Math.max(clipX, x);
         int y2 = Math.max(clipY, y);
@@ -67,10 +68,12 @@ public class Graphics {
         int y3 = Math.min(clipY + clipH, y + h);
         setClip(x2, y2, Math.max(0, x3 - x2), Math.max(0, y3 - y2));
     }
+
     public int getClipX() { return clipX; }
     public int getClipY() { return clipY; }
     public int getClipWidth() { return clipW; }
     public int getClipHeight() { return clipH; }
+
     public void fillRect(int x, int y, int w, int h) {
         ctx.setFillStyle(css);
         ctx.fillRect(x + tx, y + ty, w, h);
@@ -80,10 +83,31 @@ public class Graphics {
         ctx.strokeRect(x + tx + 0.5, y + ty + 0.5, w, h);
     }
     public void drawLine(int x1, int y1, int x2, int y2) {
+        int ax1 = x1 + tx, ay1 = y1 + ty, ax2 = x2 + tx, ay2 = y2 + ty;
+        // MIDP drawLine(x,y,x,y) paints a single pixel — required for bitmap fonts.
+        if (ax1 == ax2 && ay1 == ay2) {
+            ctx.setFillStyle(css);
+            ctx.fillRect(ax1, ay1, 1, 1);
+            return;
+        }
+        if (ax1 == ax2) {
+            int y = Math.min(ay1, ay2);
+            int h = Math.abs(ay2 - ay1) + 1;
+            ctx.setFillStyle(css);
+            ctx.fillRect(ax1, y, 1, h);
+            return;
+        }
+        if (ay1 == ay2) {
+            int x = Math.min(ax1, ax2);
+            int w = Math.abs(ax2 - ax1) + 1;
+            ctx.setFillStyle(css);
+            ctx.fillRect(x, ay1, w, 1);
+            return;
+        }
         ctx.setStrokeStyle(css);
         ctx.beginPath();
-        ctx.moveTo(x1 + tx + 0.5, y1 + ty + 0.5);
-        ctx.lineTo(x2 + tx + 0.5, y2 + ty + 0.5);
+        ctx.moveTo(ax1 + 0.5, ay1 + 0.5);
+        ctx.lineTo(ax2 + 0.5, ay2 + 0.5);
         ctx.stroke();
     }
     public void fillTriangle(int x1,int y1,int x2,int y2,int x3,int y3) {
@@ -104,10 +128,8 @@ public class Graphics {
         if ((anchor & VCENTER) != 0) ay += th / 2;
         else if ((anchor & TOP) != 0) ay += th;
         else if ((anchor & BOTTOM) != 0) { /* baseline-ish */ }
-        else ay += th; // TOP default-ish for MIDP baseline=y
-        // MIDP: y is baseline for default anchor
+        else ay += th;
         if ((anchor & (TOP|BOTTOM|VCENTER|BASELINE)) == 0) {
-            // default TOP in some impls; MIDP default is TOP
             ay = y + ty + th;
         }
         ctx.fillText(str, ax, ay);
@@ -143,7 +165,6 @@ public class Graphics {
     }
     public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int w, int h, boolean processAlpha) {
         if (rgbData == null || w <= 0 || h <= 0) return;
-        // Draw into a temp canvas then blit so clip/transform still apply via drawImage
         HTMLCanvasElement tmp = JsBridge.createCanvas(w, h);
         JsBridge.ctxDrawRGB(JsBridge.ctx2d(tmp), rgbData, offset, scanlength, 0, 0, w, h, processAlpha);
         drawCanvasJS(ctx, tmp, x + tx, y + ty);
@@ -151,10 +172,26 @@ public class Graphics {
 
     @org.teavm.jso.JSBody(params = {"ctx","c","x","y"}, script = "ctx.drawImage(c,x,y);")
     private static native void drawCanvasJS(CanvasRenderingContext2D ctx, HTMLCanvasElement c, int x, int y);
+
     public void setStrokeStyle(int style) {}
     public int getStrokeStyle() { return SOLID; }
     public void fillRoundRect(int x,int y,int w,int h,int arcW,int arcH) { fillRect(x,y,w,h); }
     public void drawRoundRect(int x,int y,int w,int h,int arcW,int arcH) { drawRect(x,y,w,h); }
     public void fillArc(int x,int y,int w,int h,int startAngle,int arcAngle) { fillRect(x,y,w,h); }
     public void drawArc(int x,int y,int w,int h,int startAngle,int arcAngle) { drawRect(x,y,w,h); }
+
+    @org.teavm.jso.JSBody(params = {"ctx"}, script =
+        "if(!ctx.__hlzRoot){ctx.save();ctx.__hlzRoot=1;ctx.__hlzDepth=0;}")
+    private static native void ensureRoot(CanvasRenderingContext2D ctx);
+
+    @org.teavm.jso.JSBody(params = {"ctx", "x", "y", "w", "h"}, script =
+        "if(!ctx.__hlzRoot){ctx.save();ctx.__hlzRoot=1;ctx.__hlzDepth=0;}"
+      + "while((ctx.__hlzDepth|0)>0){ctx.restore();ctx.__hlzDepth--;}"
+      + "ctx.save();ctx.__hlzDepth=1;"
+      + "ctx.beginPath();ctx.rect(x|0,y|0,w|0,h|0);ctx.clip();")
+    private static native void applyClip(CanvasRenderingContext2D ctx, int x, int y, int w, int h);
+
+    private void applyClip(int x, int y, int w, int h) {
+        applyClip(ctx, x, y, w, h);
+    }
 }
